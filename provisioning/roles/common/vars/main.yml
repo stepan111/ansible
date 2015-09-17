@@ -1,0 +1,6 @@
+
+#Path for slackpkg
+slackpkg_path: "/root/slackpkg-2.82.0-noarch-14.tgz"
+# Users
+user1: "test1"
+user2: "test2"

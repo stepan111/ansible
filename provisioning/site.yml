@@ -1,7 +1,6 @@
 ---
- - hosts: all 
-   tasks: 
-    - name: Test
-      command: echo "Test"
-      register: variable
-    - debug: msg="{{variable}}"
+ - hosts: all 	
+   sudo: yes
+
+   roles:
+    - common

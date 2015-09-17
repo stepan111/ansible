@@ -1,0 +1,64 @@
+---
+# Install slackpkg
+# Check slackpkg installed
+ - name: Check slackpkg
+   stat: path=/var/log/packages/slackpkg
+   register: state
+ - debug: msg="{{state.stat.exists}}"
+
+# Copy slackpkg to managed machine
+ - name: Copy slackpkg
+   copy: src="{{slackpkg_path}}" dest=/root/slackpkg.tgz
+   when: not state.stat.exists 
+# Install slackpkg
+ - name: Install slackpkg
+   command: installpkg /root/slackpkg.tgz
+   register: out
+   when: not state.stat.exists 
+ - debug: msg="{{out.stderr}}"
+   when:  not state.stat.exists 
+ - debug: msg="{{out.stdout_lines}}"
+   when: not state.stat.exists 
+
+# remove pkg
+ - name: Remove slackpkg.tgz
+   file: path=/root/slackpkg.tgz state=absent
+   when:  not state.stat.exists 
+
+# Copy startup script template
+ - name: Copy rc.M script
+   template: src=rc.M dest=/etc/rc.d/rc.M backup=yes mode=0755
+
+# Install iptables
+ - name: Install iptables with slackpkg
+   slackpkg: name="{{ item }}" state=present update_cache=yes
+   with_items:
+    - iptables
+    - libnl3
+
+# Copy iptables startup rules
+ - name: Copy iptables.save
+   template: src=iptables.save dest=/etc/iptables.save mode=0700
+
+# Copy iptables starup script
+ - name: Copy rc.firewall
+   template: src=rc.firewall  dest=/etc/rc.d/rc.firewall mode=0700
+
+# Start firewall rules
+ - name: Start firewall
+   command: /etc/rc.d/rc.firewall start
+   register: out 
+ - debug: msg="{{out}}"
+
+# Disable rpc on startup
+ - name: Disable rpc on startup
+   file: path=/etc/rc.d/rc.rpc mode=0644
+
+# Add users
+ - name: Add users
+   user: name={{ item.name }} state=present groups={{ item.groups }}
+   with_items:
+    - { name: '{{user1}}', groups: 'wheel' }
+    - { name: '{{user2}}', groups: 'wheel' }
+
+

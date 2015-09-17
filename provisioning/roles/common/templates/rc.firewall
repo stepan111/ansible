@@ -1,0 +1,21 @@
+#!/bin/sh
+# Start/stop/restart the secure shell server:
+
+iptables_start() {
+# Restore rules
+/usr/sbin/iptables-restore < /etc/iptables.save
+}
+
+
+
+case "$1" in
+'start')
+  iptables_start
+  ;;
+'restart')
+  iptables_start
+  ;;
+*)
+  echo "usage $0 start|restart"
+esac
+
