@@ -2,6 +2,7 @@
 #Path for slackpkg
 slackpkg_path: "/root/slackpkg-2.82.0-noarch-14.tgz"
 pip_path: "/home/vagrant/slackware/slackbuild/pip-7.1.2-x86_64-1_SBo.tgz"
+pysetuptools_path: "/home/vagrant/slackware/slackbuild/pysetuptools-18.2-x86_64-1_SBo.tgz"
 # Users
 user1: "test1"
 user2: "test2"

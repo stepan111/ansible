@@ -7,6 +7,18 @@
     - mariadb
     - libaio
 
+# Run mysql_install_db
+ - name: mysql_install_db
+   stat: path=/var/lib/mysql/mysql
+   register: state
+ - command: mysql_install_db --user=mysql 
+   when:  not state.stat.exists
+
+
+
+
+
+
 # Add exec right for rc.mysqld script
  - name: Add mysql to startup
    file: path=/etc/rc.d/rc.mysqld mode=755
@@ -18,41 +30,24 @@
 
  - debug: msg="{{out}}"
 
+ - copy: src="{{MySQLpython_path}}" dest=/root/Mysql-python.tgz
+ - command: installpkg /root/Mysql-python.tgz
 
-# Install pysetuptools and puython-mysql extension
- - name: Check pysetuptools
-   stat: path=/var/log/packages/pysetuptools
-   register: state
- - debug: msg="{{state.stat.exists}}"
- - command: removepkg /var/log/packages/pysetuptools
-   when: state.stat.exists
-
- - copy: src="{{pysetuptools_path}}" dest=/root/pysetuptools.tgz
- - command: installpkg /root/pysetuptools.tgz
- - file: path=/root/pysetuptools.tgz state=absent
-
-# Instal mysql-python
- - name: Check MySQL-python
-   stat: path=/var/log/packages/MySQL-python
-   register: state
- - debug: msg="{{state.stat.exists}}"
- - command: removepkg /var/log/packages/MySQL-python
-   when: state.stat.exists
-
- - copy: src="{{MySQLpython_path}}" dest=/root/MySQL-python.tgz
- - command: installpkg /root/MySQL-python.tgz
- - file: path=/root/MySQL-python.tgz state=absent
-
+ - name: Install mysqlpdb
+   pip: name=MySQL-python
 
 # Ansible mysql_secure_installation
  - name: delete anonymous MySQL server user for {{ ansible_hostname }}
-   mysql_user: user="" host="{{ ansible_hostname }}" state="absent"
+   mysql_user: login_user=root login_password='' user="" host="{{ ansible_hostname }}" state="absent"
+   ignore_errors: yes
 
  - name: delete anonymous MySQL server user for localhost
-   mysql_user: user="" state="absent"
+   mysql_user: login_user=root login_password='' user="" state="absent"
+   ignore_errors: yes
 
  - name: remove the MySQL test database
-   mysql_db: db=test state=absent
+   mysql_db: login_user=root login_password='' db=test state=absent
+   ignore_errors: yes
 
  - name: Change root user password 
    mysql_user: login_user=root
@@ -61,6 +56,7 @@
                password={{ mysql_root_password }}
                priv=*.*:ALL,GRANT
                host={{ item }}
+   ignore_errors: yes
    with_items:
     - 127.0.0.1
     - localhost
