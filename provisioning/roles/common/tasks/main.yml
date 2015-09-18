@@ -61,4 +61,20 @@
     - { name: '{{user1}}', groups: 'wheel' }
     - { name: '{{user2}}', groups: 'wheel' }
 
+# Link /usr/lib to /usr/lib64
+ - name: link /usr/lib to /usr/lib64
+   file: path=/usr/lib state=absent
 
+ - file: src=/usr/lib64 dest=/usr/lib state=link
+
+# Install pip
+ - name: Install pip
+   state: path=/var/log/packages/pip
+   register: state
+
+ - copy: src="{{pip_path}}" dest=/root/pip.tgz
+   when: not state.stat.exists
+ - command: installpkg  /root/pip.tgz
+   when: not state.stat.exists
+ - file: path=/root/pip.tgz state=absent
+   when: not state.stat.exists

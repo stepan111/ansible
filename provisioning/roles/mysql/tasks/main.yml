@@ -1,0 +1,68 @@
+---
+
+# Install mysqld and libaio
+ - name: Inastall mysql
+   slackpkg: name="{{ item }}" state=present update_cache=yes
+   with_items:
+    - mariadb
+    - libaio
+
+# Add exec right for rc.mysqld script
+ - name: Add mysql to startup
+   file: path=/etc/rc.d/rc.mysqld mode=755
+
+# Start mysql service
+ - name: Start mysql service
+   command: /etc/rc.d/rc.mysqld start
+   register: out
+
+ - debug: msg="{{out}}"
+
+
+# Install pysetuptools and puython-mysql extension
+ - name: Check pysetuptools
+   stat: path=/var/log/packages/pysetuptools
+   register: state
+ - debug: msg="{{state.stat.exists}}"
+ - command: removepkg /var/log/packages/pysetuptools
+   when: state.stat.exists
+
+ - copy: src="{{pysetuptools_path}}" dest=/root/pysetuptools.tgz
+ - command: installpkg /root/pysetuptools.tgz
+ - file: path=/root/pysetuptools.tgz state=absent
+
+# Instal mysql-python
+ - name: Check MySQL-python
+   stat: path=/var/log/packages/MySQL-python
+   register: state
+ - debug: msg="{{state.stat.exists}}"
+ - command: removepkg /var/log/packages/MySQL-python
+   when: state.stat.exists
+
+ - copy: src="{{MySQLpython_path}}" dest=/root/MySQL-python.tgz
+ - command: installpkg /root/MySQL-python.tgz
+ - file: path=/root/MySQL-python.tgz state=absent
+
+
+# Ansible mysql_secure_installation
+ - name: delete anonymous MySQL server user for {{ ansible_hostname }}
+   mysql_user: user="" host="{{ ansible_hostname }}" state="absent"
+
+ - name: delete anonymous MySQL server user for localhost
+   mysql_user: user="" state="absent"
+
+ - name: remove the MySQL test database
+   mysql_db: db=test state=absent
+
+ - name: Change root user password 
+   mysql_user: login_user=root
+               login_password=''
+               name=root
+               password={{ mysql_root_password }}
+               priv=*.*:ALL,GRANT
+               host={{ item }}
+   with_items:
+    - 127.0.0.1
+    - localhost
+
+   
