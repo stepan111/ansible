@@ -24,9 +24,22 @@
    args:
     creates: /var/lib/mysql/mysql
 
+# Create directory for mysql logs
+ - name: Create /var/log/mysql
+   file: path=/var/log/mysql state=directory mode=0755
+
+# Set default configuration
+ - name: Set configuration
+   template: src=my.cnf dest=/etc/my.cnf.d/server.cnf
+
+
 # Add exec right for rc.mysqld script
  - name: Add mysql to startup
    file: path=/etc/rc.d/rc.mysqld mode=755
+
+# Add network access
+ - name: Enable netwroking
+   replace: dest=/etc/rc.d/rc.mysqld regexp="^SKIP=" replace="#SKIP"
 
 # Start mysql service
  - name: Start mysql service
@@ -37,7 +50,7 @@
 
  - debug: msg="{{out}}"
 
- - pause: seconds=10
+ - pause: seconds=20
 
 # Ansible mysql_secure_installation
  - name: delete anonymous MySQL server user for {{ ansible_hostname }}
