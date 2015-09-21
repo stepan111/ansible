@@ -7,17 +7,22 @@
     - mariadb
     - libaio
 
+# Install python mysqpldb extension
+ - name: Install python mysqldb extension 
+   stat: path=/var/log/packages/Mysql-python
+   register: status
+ - copy: src="{{MySQLpython_path}}" dest=/root/Mysql-python.tgz
+   when: not status.stat.exists  
+ - command: installpkg /root/Mysql-python.tgz
+   when: not status.stat.exists  
+ - name: Install mysqldb
+   pip: name=MySQL-python
+
 # Run mysql_install_db
  - name: mysql_install_db
-   stat: path=/var/lib/mysql/mysql
-   register: state
- - command: mysql_install_db --user=mysql 
-   when:  not state.stat.exists
-
-
-
-
-
+   command: mysql_install_db --user=mysql 
+   args:
+    creates: /var/lib/mysql/mysql
 
 # Add exec right for rc.mysqld script
  - name: Add mysql to startup
@@ -26,15 +31,13 @@
 # Start mysql service
  - name: Start mysql service
    command: /etc/rc.d/rc.mysqld start
+   args:
+    creates: /var/run/mysql/mysql.pid
    register: out
 
  - debug: msg="{{out}}"
 
- - copy: src="{{MySQLpython_path}}" dest=/root/Mysql-python.tgz
- - command: installpkg /root/Mysql-python.tgz
-
- - name: Install mysqlpdb
-   pip: name=MySQL-python
+ - pause: seconds=10
 
 # Ansible mysql_secure_installation
  - name: delete anonymous MySQL server user for {{ ansible_hostname }}
