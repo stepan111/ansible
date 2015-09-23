@@ -1,0 +1,25 @@
+---
+# Install ntpd
+ - name: Inastall mysql
+   slackpkg: name="{{ item }}" state=present update_cache=yes
+   with_items:
+    - ntp
+
+# Copy ntp.conf
+ - name: Copy ntpd conf
+   template: src=ntp.conf dest=/etc/ntp.conf
+
+# Activate ntpd at startup
+ - name: Add ntpd to startup
+   file: path=/etc/rc.d/rc.ntpd mode=0755
+
+# Start ntpd service if it isn't
+ - name: Restart ntpd
+   command: /etc/rc.d/rc.ntpd restart
+   args:
+    removes: /var/run/ntpd.pid
+ - name: Start ntpd
+   command: /etc/rc.d/rc.ntpd start
+   args:
+    creates: /var/run/ntpd.pid
+
