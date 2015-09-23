@@ -50,7 +50,9 @@
 
  - debug: msg="{{out}}"
 
- - pause: seconds=20
+# - pause: seconds=30
+ - wait_for: path=/var/run/mysql/mysql.pid state=present delay=10
+
 
 # Ansible mysql_secure_installation
  - name: delete anonymous MySQL server user for {{ ansible_hostname }}

@@ -1,5 +1,6 @@
 ---
 # Install slackpkg
+
 # Check slackpkg installed
  - name: Check slackpkg
    stat: path=/var/log/packages/slackpkg
@@ -20,6 +21,17 @@
  - debug: msg="{{out.stdout_lines}}"
    when: not state.stat.exists 
 
+# Set up mirrors
+ - name: Set up mirrors
+   template: src=mirrors dest=/etc/slackpkg/mirrors
+ - template: src=slackpkg.conf dest=/etc/slackpkg/slackpkg.conf
+
+# Update slackpkg
+ - name: Update slackpkg
+   command: slackpkg -default_answer=y -batch=on update
+
+
+
 # remove pkg
  - name: Remove slackpkg.tgz
    file: path=/root/slackpkg.tgz state=absent
@@ -31,10 +43,13 @@
 
 # Install iptables
  - name: Install iptables with slackpkg
-   slackpkg: name="{{ item }}" state=present update_cache=yes
+   slackpkg: name="{{ item }}" state=present update_cache=true
+   register: out
    with_items:
     - iptables
     - libnl3
+
+ - debug: msg="{{out}}"
 
 # Copy iptables startup rules
  - name: Copy iptables.save
