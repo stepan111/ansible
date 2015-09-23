@@ -3,6 +3,6 @@
 *.tar.gz
 *.tgz
 slackbuild/
-.vagrant/*
+.vagrant/
 provisioning/roles/common/templates/mirrors
 
