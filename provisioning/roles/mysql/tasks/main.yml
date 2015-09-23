@@ -1,20 +1,23 @@
 ---
 
-# Install mysqld and libaio
+# Install mysqld and libaio and Mysql-python
  - name: Inastall mysql
    slackpkg: name="{{ item }}" state=present update_cache=yes
    with_items:
     - mariadb
     - libaio
+    - mysqldb-python
 
 # Install python mysqpldb extension
- - name: Install python mysqldb extension 
-   stat: path=/var/log/packages/Mysql-python
-   register: status
- - copy: src="{{MySQLpython_path}}" dest=/root/Mysql-python.tgz
-   when: not status.stat.exists  
- - command: installpkg /root/Mysql-python.tgz
-   when: not status.stat.exists  
+#Install Mysql-python extension from specified package if you have no custom repo.
+# - name: Install python mysqldb extension 
+#   stat: path=/var/log/packages/Mysql-python
+#   register: status
+# - copy: src="{{MySQLpython_path}}" dest=/root/Mysql-python.tgz
+#   when: not status.stat.exists  
+# - command: installpkg /root/Mysql-python.tgz
+#   when: not status.stat.exists  
+
  - name: Install mysqldb
    pip: name=MySQL-python
 

@@ -21,6 +21,11 @@
  - debug: msg="{{out.stdout_lines}}"
    when: not state.stat.exists 
 
+# remove pkg
+ - name: Remove slackpkg.tgz
+   file: path=/root/slackpkg.tgz state=absent
+   when:  not state.stat.exists 
+
 # Set up mirrors
  - name: Set up mirrors
    template: src=mirrors dest=/etc/slackpkg/mirrors
@@ -30,24 +35,24 @@
  - name: Update slackpkg
    command: slackpkg -default_answer=y -batch=on update
 
-
-
-# remove pkg
- - name: Remove slackpkg.tgz
-   file: path=/root/slackpkg.tgz state=absent
-   when:  not state.stat.exists 
-
 # Copy startup script template
  - name: Copy rc.M script
    template: src=rc.M dest=/etc/rc.d/rc.M backup=yes mode=0755
 
-# Install iptables
- - name: Install iptables with slackpkg
+# Link /usr/lib to /usr/lib64
+ - name: link /usr/lib to /usr/lib64
+   file: path=/usr/lib state=absent
+ - file: src=/usr/lib64 dest=/usr/lib state=link
+
+# Install packages
+ - name: Install packages with slackpkg
    slackpkg: name="{{ item }}" state=present update_cache=true
    register: out
    with_items:
     - iptables
     - libnl3
+    - pip
+    - pysetuptools
 
  - debug: msg="{{out}}"
 
@@ -76,32 +81,28 @@
     - { name: '{{user1}}', groups: 'wheel' }
     - { name: '{{user2}}', groups: 'wheel' }
 
-# Link /usr/lib to /usr/lib64
- - name: link /usr/lib to /usr/lib64
-   file: path=/usr/lib state=absent
- - file: src=/usr/lib64 dest=/usr/lib state=link
+# Install pip from package if you have no custom repo
+# - name: Install pip
+#   stat: path=/var/log/packages/pip
+#   register: state
 
-# Install pip
- - name: Install pip
-   stat: path=/var/log/packages/pip
-   register: state
+# - copy: src="{{pip_path}}" dest=/root/pip.tgz
+#   when: not state.stat.exists
+# - command: installpkg  /root/pip.tgz
+#   when: not state.stat.exists
+# - file: path=/root/pip.tgz state=absent
+#   when: not state.stat.exists
 
- - copy: src="{{pip_path}}" dest=/root/pip.tgz
-   when: not state.stat.exists
- - command: installpkg  /root/pip.tgz
-   when: not state.stat.exists
- - file: path=/root/pip.tgz state=absent
-   when: not state.stat.exists
+# Instal pysetuptools if you have no custom repo
 
-# Instal pysetuptools
- - name: Install pysetuptools
-   stat: path=/var/log/packages/pysetuptools
-   register: state
+ #- name: Install pysetuptools
+   #stat: path=/var/log/packages/pysetuptools
+   #register: state
 
- - copy: src="{{pysetuptools_path}}" dest=/root/pysetuptools.tgz
-   when: not state.stat.exists
- - command: installpkg  /root/pysetuptools.tgz
-   when: not state.stat.exists
- - file: path=/root/pysetuptools.tgz state=absent
-   when: not state.stat.exists
+ #- copy: src="{{pysetuptools_path}}" dest=/root/pysetuptools.tgz
+   #when: not state.stat.exists
+ #- command: installpkg  /root/pysetuptools.tgz
+   #when: not state.stat.exists
+ #- file: path=/root/pysetuptools.tgz state=absent
+   #when: not state.stat.exists
 
