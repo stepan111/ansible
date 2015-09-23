@@ -9,6 +9,10 @@
  - name: Copy ntpd conf
    template: src=ntp.conf dest=/etc/ntp.conf
 
+# Create ntp drift file
+ - name: create /etc/ntp.drift
+   file: path=/etc/ntp.drift state=touch  mode=0400
+
 # Activate ntpd at startup
  - name: Add ntpd to startup
    file: path=/etc/rc.d/rc.ntpd mode=0755
