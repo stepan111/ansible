@@ -64,6 +64,10 @@
  - name: Copy rc.firewall
    template: src=rc.firewall  dest=/etc/rc.d/rc.firewall mode=0700
 
+# Copy logrotate config
+ - name: Copy logrotate config
+   template: src=logrotate dest=/etc/logrotate.d/logrotate
+
 # Start firewall rules
  - name: Start firewall
    command: /etc/rc.d/rc.firewall start
