@@ -6,3 +6,7 @@ pysetuptools_path: "/home/vagrant/slackware/slackbuild/pysetuptools-18.2-x86_64-
 # Users
 user1: "test1"
 user2: "test2"
+
+public_ssh_key1: "{{ lookup('file','~/.ssh/id_rsa.pub') }}"
+public_ssh_key2: "{{ lookup('file','~/.ssh/id_rsa.pub') }}"
+

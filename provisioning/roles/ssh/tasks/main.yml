@@ -1,0 +1,15 @@
+---
+# configure ssh
+ - name: sshd disable root
+   lineinfile: dest=/etc/ssh/sshd_config regexp=PermitRootLogin line='PermitRootLogin no'
+
+# Add ssh key for new user
+ - name: add ssh key for {{ user1 }}
+   authorized_key: user={{user1}} key="{{public_ssh_key1}}"
+ - name: add ssh key {{ user2 }}
+   authorized_key: user={{user2}} key="{{public_ssh_key2}}"
+
+# restart sshd
+ - name: restart sshd
+   command: /etc/rc.d/rc.sshd restart
+

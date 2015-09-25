@@ -1,4 +1,2 @@
 
 mysql_root_password: "rootpass" 
-pysetuptools_path: "/home/vagrant/slackware/slackbuild/pysetuptools-18.2-x86_64-1_SBo.tgz"
-MySQLpython_path: "/home/vagrant/slackware/slackbuild/MySQL-python-1.2.4-x86_64-3_SBo.tgz"
