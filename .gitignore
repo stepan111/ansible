@@ -6,3 +6,4 @@ slackbuild/
 .vagrant/
 mirrors
 host_vars/
+hosts
