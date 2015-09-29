@@ -10,3 +10,4 @@ user2: "test2"
 public_ssh_key1: "{{ lookup('file','~/.ssh/id_rsa.pub') }}"
 public_ssh_key2: "{{ lookup('file','~/.ssh/id_rsa.pub') }}"
 
+default_pass: "defaultpassword"

@@ -34,14 +34,21 @@
 # Update slackpkg
  - name: Update slackpkg
    command: slackpkg -default_answer=y -batch=on update
+   register: out
+ - debug: msg="{{ out }}"
 
 # Copy startup script template
  - name: Copy rc.M script
    template: src=rc.M dest=/etc/rc.d/rc.M backup=yes mode=0755
 
 # Link /usr/lib to /usr/lib64
+ - stat: path=/usr/lib
+   register: status
  - name: link /usr/lib to /usr/lib64
-   file: path=/usr/lib state=absent
+   command: mv /usr/lib/* /usr/lib64/
+   when: not status.stat.islnk 
+   ignore_errors: True
+ - file: path=/usr/lib state=absent
  - file: src=/usr/lib64 dest=/usr/lib state=link
 
 # Install packages
@@ -82,6 +89,7 @@
 # Disable rpc on startup
  - name: Disable rpc on startup
    file: path=/etc/rc.d/rc.rpc mode=0644
+   ignore_errors: True
 
 # Add users
  - name: Add users
@@ -90,6 +98,11 @@
     - { name: '{{user1}}', groups: 'wheel' }
     - { name: '{{user2}}', groups: 'wheel' }
 
+ - name: set default pass for user1
+   command: bash -c "echo {{user1}}:{{default_pass}} | chpasswd"
+
+ - name: set default pass for user2
+   command: bash -c "echo {{user2}}:{{default_pass}} | chpasswd"
 # Install pip from package if you have no custom repo
 # - name: Install pip
 #   stat: path=/var/log/packages/pip
