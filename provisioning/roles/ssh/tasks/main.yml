@@ -3,6 +3,9 @@
  - name: sshd disable root
    lineinfile: dest=/etc/ssh/sshd_config regexp=PermitRootLogin line='PermitRootLogin no'
 
+ - name: sshd disable password auth
+   lineinfile: dest=/etc/ssh/sshd_config regexp=PasswordAuthentication line='PasswordAuthentication no'
+
 # Add ssh key for new user
  - name: add ssh key for {{ user1 }}
    authorized_key: user={{user1}} key="{{public_ssh_key1}}"

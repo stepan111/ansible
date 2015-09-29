@@ -103,6 +103,10 @@
 
  - name: set default pass for user2
    command: bash -c "echo {{user2}}:{{default_pass}} | chpasswd"
+
+ - name: set permissions for wheel group
+   lineinfile: "dest=/etc/sudoers state=present regexp='^%wheel' line='%wheel ALL=(ALL)  ALL'"
+
 # Install pip from package if you have no custom repo
 # - name: Install pip
 #   stat: path=/var/log/packages/pip
