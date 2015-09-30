@@ -330,9 +330,9 @@ if [ -x /etc/rc.d/rc.keymap ]; then
 fi
 
 # Start the MySQL database:
-#if [ -x /etc/rc.d/rc.mysqld ]; then
-#  . /etc/rc.d/rc.mysqld start
-#fi
+if [ -x /etc/rc.d/rc.mysqld ]; then
+  . /etc/rc.d/rc.mysqld start
+fi
 
 # Start Apache web server:
 if [ -x /etc/rc.d/rc.httpd ]; then
