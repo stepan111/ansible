@@ -60,6 +60,7 @@
     - libnl3
     - pip
     - pysetuptools
+    - net-snmp
 
  - debug: msg="{{out}}"
 
@@ -93,19 +94,31 @@
 
 # Add users
  - name: Add users
-   user: name={{ item.name }} state=present groups={{ item.groups }}
+   user: name={{ item.name }} state=present groups={{ item.groups }} password={{ item.pass }}
    with_items:
-    - { name: '{{user1}}', groups: 'wheel' }
-    - { name: '{{user2}}', groups: 'wheel' }
+    - { name: '{{user1}}', groups: 'wheel', pass: '{{ user1_pass }}' }
+    - { name: '{{user2}}', groups: 'wheel', pass: '{{ user2_pass }}' }
 
- - name: set default pass for user1
-   command: bash -c "echo {{user1}}:{{default_pass}} | chpasswd"
+# - name: set default pass for user1
+#   command: bash -c "echo {{user1}}:{{default_pass}} | chpasswd"
 
- - name: set default pass for user2
-   command: bash -c "echo {{user2}}:{{default_pass}} | chpasswd"
+# - name: set default pass for user2
+#   command: bash -c "echo {{user2}}:{{default_pass}} | chpasswd"
 
- - name: set permissions for wheel group
-   lineinfile: "dest=/etc/sudoers state=present regexp='^%wheel' line='%wheel ALL=(ALL)  ALL'"
+# - name: set permissions for wheel group
+#   lineinfile: "dest=/etc/sudoers state=present regexp='^%wheel' line='%wheel ALL=(ALL)  ALL'"
+
+# Add snmpd configuration
+ - name: Add snmp at startup
+   file: path=/etc/rc.d/rc.snmpd mode=0755
+
+ - name: Copy default config
+   template: src=snmpd.conf dest=/etc/snmp/snmpd.conf
+
+ - name: Start snmpd
+   command: /etc/rc.d/rc.snmpd start
+   args:
+    creates: /var/run/snmpd
 
 # Install pip from package if you have no custom repo
 # - name: Install pip
