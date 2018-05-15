@@ -1,0 +1,30 @@
+- name: Create SSL folder
+  file:
+    path: "{{ssl_directory}}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Generate certificate
+  shell: |
+    cd {{ ssl_directory }}
+    openssl req -x509 -newkey rsa:4096 \
+      -keyout {{ssl_key}} \
+      -out {{ssl_cert}} \
+      -days 365 -nodes -new -x509  \
+      -subj "/C={{self_signed_subj.country_name}}\
+        /ST={{self_signed_subj.state}}\
+        /L={{self_signed_subj.locality_name}}\
+        /O={{self_signed_subj.locality_name}}\
+        /CN={{self_signed_subj.common_name}}"
+  args:
+    creates: "{{ssl_key}}"
+
+  when: certificate == "selfSigned"
+
+- name: Generate dhparams
+  shell: |
+    openssl dhparam -out {{ssl_dhparam}} 1024
+  args:
+    creates: "{{ssl_dhparam}}"
