@@ -7,3 +7,5 @@ slackbuild/
 mirrors
 host_vars/
 hosts
+*.log
+*.retry

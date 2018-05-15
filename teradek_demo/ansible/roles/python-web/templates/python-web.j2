@@ -1,0 +1,16 @@
+[Unit]
+Description=simple Http service
+Wants=network.target
+After=network.target
+
+[Service]
+Type=simple
+User=python
+WorkingDirectory=/var/www/html
+ExecStart=/usr/bin/python -m SimpleHTTPServer
+# https://www.freedesktop.org/software/systemd/man/systemd.exec.html
+LimitNOFILE=500000
+LimitNPROC=5
+
+[Install]
+WantedBy=multi-user.target

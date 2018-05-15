@@ -1,0 +1,22 @@
+- name: Create app User
+  user:
+    name: python
+    group: daemon
+    createhome: no
+    system: yes
+
+
+
+- name: Copy systemd service
+  template:
+    src: python-web.j2
+    dest: /etc/systemd/system/python-web.service
+    owner: root
+    mode: 0644
+
+- name: start and enable python-web
+  systemd:
+    name: python-web
+    state: started
+    enabled: yes
+    daemon_reload: yes

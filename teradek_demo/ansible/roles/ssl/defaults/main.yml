@@ -1,0 +1,6 @@
+self_signed_subj:
+  country_name: "UA"
+  state: "Odessa"
+  locality_name: "Odessa"
+  org_unit: "test"
+  common_name: "localhost"

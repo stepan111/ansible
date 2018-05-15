@@ -1,0 +1,13 @@
+---
+ - hosts: all
+   become: true
+   vars:
+    ssl_directory: "/etc/balancer_ssl"
+    ssl_key: "{{ssl_directory}}/key.pem"
+    ssl_cert: "{{ssl_directory}}/cert.pem"
+    ssl_dhparam: "{{ssl_directory}}/dhparam.pem"
+
+   roles:
+    - { role: ssl, certificate: "selfSigned" }
+    - { role: nginx, backend: "localhost" }
+    - { role: python-web }
